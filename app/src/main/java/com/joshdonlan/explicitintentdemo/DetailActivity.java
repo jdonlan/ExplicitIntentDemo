@@ -33,9 +33,8 @@ public class DetailActivity extends Activity implements DetailFragment.DetailLis
         if(detailIntent != null){
             mContact = (Contact) detailIntent.getSerializableExtra(CONTACTEXTRA);
             mDelete = detailIntent.getIntExtra(DELETEEXTRA, 0);
-        } else {
-            finish();
         }
+
     }
 
 

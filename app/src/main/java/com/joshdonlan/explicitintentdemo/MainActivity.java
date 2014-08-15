@@ -58,28 +58,29 @@ public class MainActivity extends Activity implements MainFragment.ContactListen
         return super.onOptionsItemSelected(item);
     }
 
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == Activity.RESULT_OK && requestCode == DELETEREQUEST) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        if(resultCode == Activity.RESULT_OK && requestCode == DELETEREQUEST){
             mContactDataList.remove(data.getIntExtra(DELETECONTACTEXTRA,0));
             MainFragment mf = (MainFragment) getFragmentManager().findFragmentById(R.id.container);
             mf.updateListData();
         }
     }
 
+
     //INTERFACE METHODS
     @Override
     public void viewContact(int position){
         Intent detailIntent = new Intent(this, DetailActivity.class);
-        detailIntent.putExtra(DetailActivity.CONTACTEXTRA,mContactDataList.get(position));
+        detailIntent.putExtra(DetailActivity.CONTACTEXTRA, mContactDataList.get(position));
         startActivity(detailIntent);
     }
 
     @Override
     public void deleteContact(int position){
-        Intent detailIntent = new Intent(this, DetailActivity.class);
-        detailIntent.putExtra(DetailActivity.CONTACTEXTRA, mContactDataList.get(position));
-        detailIntent.putExtra(DetailActivity.DELETEEXTRA,position);
-        startActivityForResult(detailIntent, MainActivity.DELETEREQUEST);
+        Intent deleteIntent = new Intent(this, DetailActivity.class);
+        deleteIntent.putExtra(DetailActivity.CONTACTEXTRA, mContactDataList.get(position));
+        deleteIntent.putExtra(DetailActivity.DELETEEXTRA, position);
+        startActivityForResult(deleteIntent, DELETEREQUEST);
     }
 
     @Override
