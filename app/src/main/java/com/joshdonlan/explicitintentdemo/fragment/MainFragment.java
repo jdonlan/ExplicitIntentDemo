@@ -1,15 +1,16 @@
 package com.joshdonlan.explicitintentdemo.fragment;
 
+import android.app.Activity;
 import android.app.Fragment;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.BaseAdapter;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 
-import com.joshdonlan.explicitintentdemo.DetailActivity;
 import com.joshdonlan.explicitintentdemo.R;
 import com.joshdonlan.fakedata.Contact;
 import com.joshdonlan.fakedata.ContactAdapter;
@@ -22,14 +23,29 @@ import java.util.ArrayList;
 public class MainFragment extends Fragment {
 
     private final String TAG = "MAINFRAGMENT";
-    private ArrayList<Contact> mContactDataList;
+
+    private ContactListener mListener;
+    private ArrayList<Contact> mContactList;
+
+    public interface ContactListener{
+        public void viewContact(int position);
+        public void deleteContact(int position);
+        public ArrayList<Contact> getContacts();
+    }
 
     public MainFragment() {
-        mContactDataList = new ArrayList<Contact>();
-        mContactDataList.add(new Contact("Josh","Donlan","jdonlan@fullsail.com","407-679-0100 x8594"));
-        mContactDataList.add(new Contact("Michael","Celey","mceley@fullsail.com","407-679-0100"));
-        mContactDataList.add(new Contact("Sherry","Dubin","sdubin@fullsail.com","407-679-0100"));
-        mContactDataList.add(new Contact("Gyasi","Story","gstory@fullsail.com","407-679-0100 x8488"));
+
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
+        if(activity instanceof ContactListener) {
+            mListener = (ContactListener) activity;
+        } else {
+            throw new IllegalArgumentException("Containing activity must implement DetailListener interface");
+        }
     }
 
     @Override
@@ -43,21 +59,28 @@ public class MainFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         ListView contactListView = (ListView) getView().findViewById(R.id.contactList);
-        ContactAdapter contactAdapter = new ContactAdapter(getView().getContext(), mContactDataList);
+        ContactAdapter contactAdapter = new ContactAdapter(getActivity(), mListener.getContacts());
         contactListView.setAdapter(contactAdapter);
 
         contactListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent detailIntent = new Intent(getView().getContext(), DetailActivity.class);
-//                detailIntent.putExtra("first",mContactDataList.get(position).getFirst());
-//                detailIntent.putExtra("last",mContactDataList.get(position).getLast());
-//                detailIntent.putExtra("email",mContactDataList.get(position).getEmail());
-//                detailIntent.putExtra("phone",mContactDataList.get(position).getPhone());
-                detailIntent.putExtra("contact",mContactDataList.get(position));
-                startActivity(detailIntent);
-
+                mListener.viewContact(position);
             }
         });
+
+        contactListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                mListener.deleteContact(position);
+                return true;
+            }
+        });
+    }
+
+    public void updateListData(){
+        ListView contactList = (ListView) getView().findViewById(R.id.contactList);
+        BaseAdapter contactAdapter = (BaseAdapter) contactList.getAdapter();
+        contactAdapter.notifyDataSetChanged();
     }
 }

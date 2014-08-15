@@ -1,20 +1,25 @@
 package com.joshdonlan.explicitintentdemo;
 
 import android.app.Activity;
-import android.app.ActionBar;
-import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.os.Build;
 
 import com.joshdonlan.explicitintentdemo.fragment.MainFragment;
+import com.joshdonlan.fakedata.Contact;
+
+import java.util.ArrayList;
 
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements MainFragment.ContactListener {
+
+    private final String TAG = "MAINACTIVITY";
+
+    public static final int DELETEREQUEST = 1;
+    public static final String DELETECONTACTEXTRA = "com.jdonlan.explicitintentdemo.Delete";
+
+    private ArrayList<Contact> mContactDataList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +30,12 @@ public class MainActivity extends Activity {
                     .add(R.id.container, new MainFragment())
                     .commit();
         }
+
+        mContactDataList = new ArrayList<Contact>();
+        mContactDataList.add(new Contact("Josh","Donlan","jdonlan@fullsail.com","407-679-0100 x8594"));
+        mContactDataList.add(new Contact("Michael","Celey","mceley@fullsail.com","407-679-0100"));
+        mContactDataList.add(new Contact("Sherry","Dubin","sdubin@fullsail.com","407-679-0100"));
+        mContactDataList.add(new Contact("Gyasi","Story","gstory@fullsail.com","407-679-0100 x8488"));
     }
 
 
@@ -47,4 +58,32 @@ public class MainActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == Activity.RESULT_OK && requestCode == DELETEREQUEST) {
+            mContactDataList.remove(data.getIntExtra(DELETECONTACTEXTRA,0));
+            MainFragment mf = (MainFragment) getFragmentManager().findFragmentById(R.id.container);
+            mf.updateListData();
+        }
+    }
+
+    //INTERFACE METHODS
+    @Override
+    public void viewContact(int position){
+        Intent detailIntent = new Intent(this, DetailActivity.class);
+        detailIntent.putExtra(DetailActivity.CONTACTEXTRA,mContactDataList.get(position));
+        startActivity(detailIntent);
+    }
+
+    @Override
+    public void deleteContact(int position){
+        Intent detailIntent = new Intent(this, DetailActivity.class);
+        detailIntent.putExtra(DetailActivity.CONTACTEXTRA, mContactDataList.get(position));
+        detailIntent.putExtra(DetailActivity.DELETEEXTRA,position);
+        startActivityForResult(detailIntent, MainActivity.DELETEREQUEST);
+    }
+
+    @Override
+    public ArrayList<Contact> getContacts() {
+        return mContactDataList;
+    }
 }

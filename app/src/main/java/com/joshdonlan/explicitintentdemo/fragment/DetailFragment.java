@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.joshdonlan.explicitintentdemo.R;
@@ -16,10 +17,14 @@ import com.joshdonlan.fakedata.Contact;
  */
 public class DetailFragment extends Fragment{
 
+    private final String TAG = "DETAILFRAGMENT";
+
     private DetailListener mListener;
 
     public interface DetailListener{
         public Contact getContact();
+        public int getDelete();
+        public void deleteContact();
     }
 
     public DetailFragment() {
@@ -55,5 +60,16 @@ public class DetailFragment extends Fragment{
         tv.setText(mListener.getContact().getEmail());
         tv = (TextView) getView().findViewById(R.id.detailPhone);
         tv.setText(mListener.getContact().getPhone());
+
+        if(mListener.getDelete() > 0){
+            Button deleteButton = (Button) getView().findViewById(R.id.deleteButton);
+            deleteButton.setVisibility(View.VISIBLE);
+            deleteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mListener.deleteContact();
+                }
+            });
+        }
     }
 }

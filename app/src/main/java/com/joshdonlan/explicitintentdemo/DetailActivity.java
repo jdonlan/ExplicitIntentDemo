@@ -1,24 +1,23 @@
 package com.joshdonlan.explicitintentdemo;
 
 import android.app.Activity;
-import android.app.ActionBar;
-import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.os.Build;
 
-import com.joshdonlan.explicitintentdemo.R;
 import com.joshdonlan.explicitintentdemo.fragment.DetailFragment;
 import com.joshdonlan.fakedata.Contact;
 
 public class DetailActivity extends Activity implements DetailFragment.DetailListener {
 
+    private final String TAG = "DETAILACTIVITY";
+
     private Contact mContact;
+    private int mDelete;
+
+    public static final String CONTACTEXTRA = "com.jdonlan.explicitintentdemo.Contact";
+    public static final String DELETEEXTRA = "com.jdonlan.explicitintentdemo.Delete";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +31,8 @@ public class DetailActivity extends Activity implements DetailFragment.DetailLis
 
         Intent detailIntent = getIntent();
         if(detailIntent != null){
-            mContact = (Contact) detailIntent.getSerializableExtra("contact");
+            mContact = (Contact) detailIntent.getSerializableExtra(CONTACTEXTRA);
+            mDelete = detailIntent.getIntExtra(DELETEEXTRA, 0);
         } else {
             finish();
         }
@@ -63,5 +63,18 @@ public class DetailActivity extends Activity implements DetailFragment.DetailLis
     @Override
     public Contact getContact() {
         return mContact;
+    }
+
+    @Override
+    public int getDelete(){
+        return mDelete;
+    }
+
+    @Override
+    public void deleteContact() {
+        Intent returnIntent = new Intent();
+        returnIntent.putExtra(MainActivity.DELETECONTACTEXTRA, mDelete);
+        setResult(RESULT_OK, returnIntent);
+        finish();
     }
 }
